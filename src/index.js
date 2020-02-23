@@ -1,12 +1,17 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
+app.allowRendererProcessReuse = true;
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
-  mainWindow.loadFile(path.join(__dirname, "login.html"));
+  mainWindow.loadFile(path.join(__dirname, "pages/login.html"));
   mainWindow.webContents.openDevTools();
 };
 

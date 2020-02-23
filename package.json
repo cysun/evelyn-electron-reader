@@ -45,7 +45,11 @@
     }
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "bcryptjs": "^2.4.3",
+    "electron-log": "^4.0.6",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^5.1.1",
+    "pg": "^7.18.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "6.0.0-beta.49",

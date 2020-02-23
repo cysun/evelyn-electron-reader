@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <link rel="stylesheet" href="../lib/bootswatch/cyborg/bootstrap.min.css" />
+    <title>Evelyn Reader</title>
+  </head>
+  <body class="container">
+    <div class="row vh-100 align-items-center justify-content-center">
+      <div class="col-8 col-sm-6 col-md-4 col-lg-3">
+        <form>
+          <div class="form-group">
+            <input
+              id="username"
+              class="form-control"
+              type="text"
+              placeholder="Username"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              id="password"
+              class="form-control"
+              type="password"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <button type="button" class="btn btn-outline-primary">Login</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <script src="../lib/jquery-3.4.1.slim.min.js"></script>
+    <script>
+      const log = require("electron-log");
+      const db = require("../db.js");
+      const login = () => {
+        let username = $("#username").val();
+        let password = $("#password").val();
+        if (!username || !password) return;
+        db.authenticate(username, password).then(result => {
+          if (result) {
+            db.close();
+            log.info(`${username} authenticated`);
+            window.location.href = "books.html";
+          } else {
+            $("#username").val("");
+            $("#password").val("");
+          }
+        });
+      };
+      $(function() {
+        $(window).keydown(function(event) {
+          if (event.keyCode == 13) {
+            event.preventDefault();
+            login();
+          }
+        });
+        $("button").click(login);
+      });
+    </script>
+    <script>
+      if (window.module) module = window.module;
+    </script>
+  </body>
+</html>
