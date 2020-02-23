@@ -11,9 +11,72 @@
       content="script-src 'self' 'unsafe-inline';"
     />
     <link rel="stylesheet" href="../lib/bootswatch/cyborg/bootstrap.min.css" />
+    <script defer src="../lib/fontawesome-5.12.1.min.js"></script>
     <title>Evelyn Reader</title>
   </head>
   <body class="container">
-    <h2>Books</h2>
+    <header class="mt-3">
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active">Books</li>
+          <li class="ml-auto">
+            <form class="form-inline">
+              <div class="input-group">
+                <input type="text" name="term" class="form-control-small" />
+                <div class="input-group-append">
+                  <a class="btn btn-outline-secondary btn-sm"
+                    ><i class="fas fa-times"></i
+                  ></a>
+                </div>
+              </div>
+            </form>
+          </li>
+        </ol>
+      </nav>
+    </header>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Book</th>
+          <th>Author</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <script src="../lib/jquery-3.4.1.slim.min.js"></script>
+    <script>
+      const db = require("../db.js");
+      db.getBooks().then(result => {
+        let tbody = $("tbody");
+        result.rows.forEach(row => {
+          tbody.append(
+            "<tr><td></td><td><a href='javascript:viewBook(" +
+              row["Id"] +
+              ")'>" +
+              row["Title"] +
+              "</a></td><td>" +
+              row["Author"] +
+              "</td><td>" +
+              row["LastUpdated"].toLocaleDateString() +
+              "</td></tr>"
+          );
+        });
+      });
+
+      function viewBook(id) {
+        console.log(id);
+      }
+    </script>
+    <script>
+      if (window.module) module = window.module;
+    </script>
   </body>
 </html>

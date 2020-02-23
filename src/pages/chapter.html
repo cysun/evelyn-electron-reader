@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <link rel="stylesheet" href="../lib/bootswatch/cyborg/bootstrap.min.css" />
+    <script defer src="../lib/fontawesome-5.12.1.min.js"></script>
+    <title>Evelyn Reader</title>
+  </head>
+  <body class="container">
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <script src="../lib/jquery-3.4.1.slim.min.js"></script>
+    <script>
+        let params = new URLSearchParams(window.location.search);
+        console.log(params.get("id"));
+    </script>
+    <script>
+      if (window.module) module = window.module;
+    </script>
+  </body>
+</html>

@@ -31,7 +31,22 @@ const authenticate = async (username, password) => {
   }
 };
 
+const getBooks = async () => {
+  let sql = 'select * from "Books" order by "LastUpdated" desc';
+  return await pool.query(sql);
+};
+
+const getBook = async id => {
+  let sql = `select b."Id", b."Title", count(c."Id") as "ChaptersCount"
+    from "Books" b innner join "Chapters" c on c."BookId" == b."Id"
+    where b."Id" = $1
+    group by b."Id", b."Title"`;
+  return await pool.query(sql, [id]);
+};
+
 module.exports = {
   close,
-  authenticate
+  authenticate,
+  getBooks,
+  getBook
 };
