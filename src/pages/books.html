@@ -54,29 +54,39 @@
     <script>
       const log = require("electron-log");
       const db = require("../db.js");
+      const { remote } = require("electron");
+      const userId = remote.getGlobal("sharedData").userId;
       $(function() {
         db.getBooks().then(result => {
           log.debug(`${result.rows.length} books found.`);
           let tbody = $("tbody");
-          result.rows
-            .forEach(row => {
-              tbody.append(
-                "<tr><td></td><td><a href='javascript:viewBook(" +
-                  row["Id"] +
-                  ")'>" +
-                  row["Title"] +
-                  "</a></td><td>" +
-                  row["Author"] +
-                  "</td><td>" +
-                  row["LastUpdated"].toLocaleDateString() +
-                  "</td></tr>"
-              );
-            });
+          result.rows.forEach(row => {
+            tbody.append(
+              "<tr><td></td><td><a href='javascript:viewBook(" +
+                row["Id"] +
+                ")'>" +
+                row["Title"] +
+                "</a></td><td>" +
+                row["Author"] +
+                "</td><td>" +
+                row["LastUpdated"].toLocaleDateString() +
+                "</td></tr>"
+            );
+          });
         });
       });
-      function viewBook(id) {
-        db.close();
-        window.location.href=`chapter.html?bookId=${id}&chapterNumber=1`;
+      function viewBook(bookId) {
+        db.getAutoBookmark(userId, bookId).then(result => {
+          let chapterNumber = 1;
+          let paragraph = 1;
+          if (result.rows.length > 0) {
+            chapterNumber = result.rows[0]["ChapterNumber"];
+            paragraph = result.rows[0]["Paragraph"];
+          }
+          db.close();
+          window.location.href = `chapter.html?bookId=${bookId}\
+            &chapterNumber=${chapterNumber}&paragraph=${paragraph}`;
+        });
       }
     </script>
     <script>

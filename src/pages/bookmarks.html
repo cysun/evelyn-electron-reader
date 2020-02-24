@@ -47,7 +47,9 @@
           result.rows.forEach(row => {
             let newRow = `<tr>
               <td>${row["BookTitle"]}</td>
-              <td>${row["ChapterName"]}`;
+              <td><a href="chapter.html?bookId=${row["BookId"]}\
+              &chapterNumber=${row["ChapterNumber"]}\
+              &paragraph=${row["Paragraph"]}">${row["ChapterName"]}</a>`;
             if (!row["IsManual"])
               newRow += "<span class='badge badge-secondary ml-2'>auto</span>";
             newRow += "</td><td></td></tr>";

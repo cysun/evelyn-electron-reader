@@ -57,6 +57,13 @@ const getChapters = bookId => {
   return pool.query(sql, [bookId]);
 };
 
+const getAutoBookmark = (userId, bookId) => {
+  let sql = `select k."Paragraph", c."Number" as "ChapterNumber"
+    from "Bookmarks" k inner join "Chapters" c on k."ChapterId" = c."Id"
+    where k."UserId" = $1 and c."BookId" = $2 and k."IsManual" = 'f'`;
+  return pool.query(sql, [userId, bookId]);
+};
+
 const getBookmarks = userId => {
   let sql = `select k."Id", k."Paragraph", k."IsManual",
     b."Id" as "BookId", b."Title" as "BookTitle",
@@ -81,6 +88,7 @@ module.exports = {
   getBooks,
   getChapter,
   getChapters,
+  getAutoBookmark,
   getBookmarks,
   getFile
 };

@@ -19,7 +19,11 @@ const menuTemplate = [
   },
   { label: "Exit", role: "quit" }
 ];
-if (isDev) menuTemplate.unshift({ label: "DevTools", role: "toggleDevTools" });
+if (isDev)
+  menuTemplate.unshift(
+    { label: "DevTools", role: "toggleDevTools" },
+    { label: "Reload", role: "reload" }
+  );
 
 global.sharedData = { userId: null };
 
