@@ -12,11 +12,16 @@ const menuTemplate = [
     }
   },
   {
-    label: "Bookmarks"
+    label: "Bookmarks",
+    click: (item, focusedWindow) => {
+      focusedWindow.loadFile(path.join(__dirname, "pages/bookmarks.html"));
+    }
   },
   { label: "Exit", role: "quit" }
 ];
 if (isDev) menuTemplate.unshift({ label: "DevTools", role: "toggleDevTools" });
+
+global.sharedData = { userId: null };
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({

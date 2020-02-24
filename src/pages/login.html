@@ -49,6 +49,7 @@
     <script>
       const log = require("electron-log");
       const db = require("../db.js");
+      const remote = require("electron").remote;
       const login = () => {
         let username = $("#username").val();
         let password = $("#password").val();
@@ -57,9 +58,8 @@
           if (result) {
             db.close();
             log.info(`${username} authenticated`);
-            require("electron")
-              .remote.getCurrentWindow()
-              .setMenuBarVisibility(true);
+            remote.getGlobal("sharedData").userId = result;
+            remote.getCurrentWindow().setMenuBarVisibility(true);
             window.location.href = "books.html";
           } else {
             $("#username").val("");

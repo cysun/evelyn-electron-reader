@@ -22,13 +22,13 @@ const authenticate = async (username, password) => {
   let sql = 'select * from "Users" where "Name" = $1';
   try {
     let result = await pool.query(sql, [username]);
-    return (
+    if (
       result.rows.length == 1 &&
       (await bcrypt.compare(password, result.rows[0]["Hash"]))
-    );
+    )
+      return parseInt(result.rows[0]["Id"]);
   } catch (e) {
     log.error(e.message);
-    return false;
   }
 };
 
@@ -57,6 +57,18 @@ const getChapters = bookId => {
   return pool.query(sql, [bookId]);
 };
 
+const getBookmarks = userId => {
+  let sql = `select k."Id", k."Paragraph", k."IsManual",
+    b."Id" as "BookId", b."Title" as "BookTitle",
+    c."Name" as "ChapterName", c."Number" as "ChapterNumber"
+    from "Bookmarks" k
+    inner join "Chapters" c on k."ChapterId" = c."Id"
+    inner join "Books" b on c."BookId" = b."Id"
+    where k."UserId" = $1
+    order by k."IsManual", k."Timestamp" desc`;
+  return pool.query(sql, [userId]);
+};
+
 const getFile = id => {
   let sql = 'select * from "Files" where "Id" = $1';
   return pool.query(sql, [id]);
@@ -69,5 +81,6 @@ module.exports = {
   getBooks,
   getChapter,
   getChapters,
+  getBookmarks,
   getFile
 };
