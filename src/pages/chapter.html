@@ -11,10 +11,27 @@
       content="script-src 'self' 'unsafe-inline';"
     />
     <link rel="stylesheet" href="../lib/bootswatch/cyborg/bootstrap.min.css" />
+    <style>
+      p {
+        font-size: 150%;
+      }
+    </style>
     <script defer src="../lib/fontawesome-5.12.1.min.js"></script>
     <title>Evelyn Reader</title>
   </head>
-  <body class="container">
+  <body class="container min-vh-100">
+    <nav class="mt-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="books.html">Books</a></li>
+        <li class="breadcrumb-item">
+          <a id="chaptersLink" href="#"><span class="book-title"></span></a>
+        </li>
+        <li class="breadcrumb-item active">
+          <span class="chapter-name"></span>
+        </li>
+      </ol>
+    </nav>
+    <div id="content"></div>
     <script>
       if (typeof module === "object") {
         window.module = module;
@@ -22,9 +39,53 @@
       }
     </script>
     <script src="../lib/jquery-3.4.1.slim.min.js"></script>
+    <script src="../lib/hammer-2.0.8.min.js"></script>
     <script>
-        let params = new URLSearchParams(window.location.search);
-        console.log(params.get("id"));
+      const log = require("electron-log");
+      const db = require("../db.js");
+      const params = new URLSearchParams(window.location.search);
+      $(function() {
+        let bookId = parseInt(params.get("bookId"));
+        let chapterNumber = parseInt(params.get("chapterNumber"));
+        let chaptersCount = 1;
+        db.getBook(bookId)
+          .then(result => {
+            let book = result.rows[0];
+            chaptersCount = parseInt(book["ChaptersCount"]);
+            $(".book-title").text(book["Title"]);
+            return db.getChapter(bookId, chapterNumber);
+          })
+          .then(result => {
+            let chapter = result.rows[0];
+            $(".chapter-name").text(chapter["Name"]);
+            let fileId = parseInt(chapter["HtmlFileId"]);
+            return db.getFile(fileId);
+          })
+          .then(result => {
+            $("#content").html(result.rows[0]["Content"].toString("UTF8"));
+          })
+          .then(() => {
+            $("h2").addClass("d-none");
+          })
+          .then(() => {
+            var hammer = new Hammer(document.getElementsByTagName("body")[0]);
+            hammer.on("swipe", function(event) {
+              if (event.offsetDirection == 2) {
+                // left swipe
+                if (chapterNumber < chaptersCount)
+                  window.location.href = `chapter.html?bookId=${bookId}&chapterNumber=${chapterNumber +
+                    1}`;
+                else window.location.href = "books.html";
+              } else if (event.offsetDirection == 4) {
+                // right swipe
+                if (chapterNumber > 1)
+                  window.location.href = `chapter.html?bookId=${bookId}&chapterNumber=${chapterNumber -
+                    1}`;
+                else window.location.href = "books.html";
+              }
+            });
+          });
+      });
     </script>
     <script>
       if (window.module) module = window.module;

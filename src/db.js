@@ -11,9 +11,14 @@ const pool = store.has("dbconfig")
       host: "localhost",
       port: 5432,
       database: "evelyn",
+      client_encoding: "utf8",
       user: "cysun",
       password: "abcd"
     });
+
+pool.on("connect", () => {
+  log.debug("db connected");
+});
 
 const close = () => pool.end(() => log.info("db closed"));
 
@@ -32,15 +37,27 @@ const authenticate = async (username, password) => {
 };
 
 const getBooks = async () => {
-  let sql = 'select * from "Books" order by "LastUpdated" desc';
+  let sql = `select "Id", "Title", "Author", "LastUpdated" from "Books"
+    order by "LastUpdated" desc`;
   return await pool.query(sql);
 };
 
 const getBook = async id => {
   let sql = `select b."Id", b."Title", count(c."Id") as "ChaptersCount"
-    from "Books" b innner join "Chapters" c on c."BookId" == b."Id"
+    from "Books" b inner join "Chapters" c on c."BookId" = b."Id"
     where b."Id" = $1
     group by b."Id", b."Title"`;
+  return await pool.query(sql, [id]);
+};
+
+const getChapter = async (bookId, chapterNumber) => {
+  let sql = `select "Id", "Name", "HtmlFileId" from "Chapters"
+    where "BookId" = $1 and "Number" = $2`;
+  return await pool.query(sql, [bookId, chapterNumber]);
+};
+
+const getFile = async id => {
+  let sql = 'select * from "Files" where "Id" = $1';
   return await pool.query(sql, [id]);
 };
 
@@ -48,5 +65,7 @@ module.exports = {
   close,
   authenticate,
   getBooks,
-  getBook
+  getBook,
+  getChapter,
+  getFile
 };

@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
-app.allowRendererProcessReuse = true;
+app.allowRendererProcessReuse = false;
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
