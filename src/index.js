@@ -12,7 +12,6 @@ const createWindow = () => {
     }
   });
   mainWindow.loadFile(path.join(__dirname, "pages/login.html"));
-  mainWindow.webContents.openDevTools();
 };
 
 app.on("ready", createWindow);

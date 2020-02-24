@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <link rel="stylesheet" href="../lib/bootswatch/cyborg/bootstrap.min.css" />
+    <style>
+      p {
+        font-size: 150%;
+      }
+    </style>
+    <title>Evelyn Reader</title>
+  </head>
+  <body class="container min-vh-100">
+    <nav class="mt-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="books.html">Books</a></li>
+        <li class="breadcrumb-item active">
+          <span class="book-title"></span>
+        </li>
+      </ol>
+    </nav>
+    <table class="table table-hover">
+      <tbody></tbody>
+    </table>
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <script src="../lib/jquery-3.4.1.slim.min.js"></script>
+    <script>
+      const log = require("electron-log");
+      const db = require("../db.js");
+      const params = new URLSearchParams(window.location.search);
+      var bookId = parseInt(params.get("bookId"));
+      $(function() {
+        $(document).keyup(function(event) {
+          if (event.key == "Escape") {
+            window.location.href = "books.html";
+          }
+        });
+        db.getBook(bookId)
+          .then(result => {
+            let book = result.rows[0];
+            $(".book-title").text(book["Title"]);
+            return db.getChapters(bookId);
+          })
+          .then(result => {
+            let tbody = $("tbody");
+            result.rows.forEach(row => {
+              tbody.append(
+                "<tr><td>" +
+                  row["Number"] +
+                  `</td><td><a href='chapter.html?bookId=${bookId}&chapterNumber=${row["Number"]}'>` +
+                  row["Name"] +
+                  "</a></td></tr>"
+              );
+            });
+          });
+      });
+    </script>
+    <script>
+      if (window.module) module = window.module;
+    </script>
+  </body>
+</html>
