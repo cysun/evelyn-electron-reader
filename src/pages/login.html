@@ -57,6 +57,9 @@
           if (result) {
             db.close();
             log.info(`${username} authenticated`);
+            require("electron")
+              .remote.getCurrentWindow()
+              .setMenuBarVisibility(true);
             window.location.href = "books.html";
           } else {
             $("#username").val("");

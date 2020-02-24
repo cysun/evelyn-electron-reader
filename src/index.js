@@ -1,7 +1,22 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Menu } = require("electron");
+const isDev = require("electron-is-dev");
 const path = require("path");
 
 app.allowRendererProcessReuse = false;
+
+const menuTemplate = [
+  {
+    label: "Books",
+    click: (item, focusedWindow) => {
+      focusedWindow.loadFile(path.join(__dirname, "pages/books.html"));
+    }
+  },
+  {
+    label: "Bookmarks"
+  },
+  { label: "Exit", role: "quit" }
+];
+if (isDev) menuTemplate.unshift({ label: "DevTools", role: "toggleDevTools" });
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -11,10 +26,14 @@ const createWindow = () => {
       nodeIntegration: true
     }
   });
+  mainWindow.setMenuBarVisibility(false);
   mainWindow.loadFile(path.join(__dirname, "pages/login.html"));
 };
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
