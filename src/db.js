@@ -40,10 +40,13 @@ const getBook = id => {
   return pool.query(sql, [id]);
 };
 
-const getBooks = () => {
+const getBooks = term => {
   let sql = `select "Id", "Title", "Author", "LastUpdated" from "Books"
     order by "LastUpdated" desc`;
-  return pool.query(sql);
+  if (term)
+    sql = `select "Id", "Title", "Author", "LastUpdated" from "Books"
+      where plainto_tsquery($1) @@ tsv`;
+  return term ? pool.query(sql, [term]) : pool.query(sql);
 };
 
 const getChapter = (bookId, chapterNumber) => {

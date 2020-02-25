@@ -24,7 +24,7 @@
             <div class="input-group">
               <input type="text" name="term" class="form-control-small" />
               <div class="input-group-append">
-                <a class="btn btn-outline-secondary btn-sm"
+                <a class="btn btn-outline-secondary btn-sm" href="books.html"
                   ><i class="fas fa-times"></i
                 ></a>
               </div>
@@ -56,8 +56,11 @@
       const db = require("../db.js");
       const { remote } = require("electron");
       const userId = remote.getGlobal("sharedData").userId;
+      const params = new URLSearchParams(window.location.search);
+      const term = params.get("term");
       $(function() {
-        db.getBooks().then(result => {
+        if (term) $("input").val(term);
+        db.getBooks(term).then(result => {
           log.debug(`${result.rows.length} books found.`);
           let tbody = $("tbody");
           result.rows.forEach(row => {
