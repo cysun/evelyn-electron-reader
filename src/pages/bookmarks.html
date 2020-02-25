@@ -45,14 +45,23 @@
         db.getBookmarks(userId).then(result => {
           let tbody = $("tbody");
           result.rows.forEach(row => {
-            let newRow = `<tr>
+            let newRow = $(`<tr>
               <td>${row["BookTitle"]}</td>
               <td><a href="chapter.html?bookId=${row["BookId"]}\
               &chapterNumber=${row["ChapterNumber"]}\
-              &paragraph=${row["Paragraph"]}">${row["ChapterName"]}</a>`;
+              &paragraph=${row["Paragraph"]}">${row["ChapterName"]}</a>
+              </td><td></td></tr>`);
             if (!row["IsManual"])
-              newRow += "<span class='badge badge-secondary ml-2'>auto</span>";
-            newRow += "</td><td></td></tr>";
+              newRow
+                .children("td:nth-child(2)")
+                .append("<span class='badge badge-secondary ml-2'>auto</span>");
+            let delButton = $("<span><i class='fas fa-trash-alt'></i></span>");
+            delButton.click(function() {
+              db.deleteBookmark(row["Id"]).then(() => {
+                newRow.remove();
+              });
+            });
+            newRow.children("td:last-child").append(delButton);
             tbody.append(newRow);
           });
         });

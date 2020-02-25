@@ -58,10 +58,29 @@ const getChapters = bookId => {
 };
 
 const getAutoBookmark = (userId, bookId) => {
-  let sql = `select k."Paragraph", c."Number" as "ChapterNumber"
+  let sql = `select k."Id", k."Paragraph", c."Number" as "ChapterNumber"
     from "Bookmarks" k inner join "Chapters" c on k."ChapterId" = c."Id"
     where k."UserId" = $1 and c."BookId" = $2 and k."IsManual" = 'f'`;
   return pool.query(sql, [userId, bookId]);
+};
+
+const setAutoBookmark = (userId, bookId, chapterId, paragraph) => {
+  log.debug(
+    `setAutoBookmark: ${userId}, ${bookId}, ${chapterId}, ${paragraph}`
+  );
+  getAutoBookmark(userId, bookId).then(result => {
+    if (result.rowCount < 1) {
+      let sql = `insert into "Bookmarks"
+        ("UserId", "ChapterId", "Paragraph") values ($1, $2, $3)`;
+      pool.query(sql, [userId, chapterId, paragraph]);
+    } else {
+      let bookmarkId = parseInt(result.rows[0]["Id"]);
+      let sql = `update "Bookmarks" set
+        "ChapterId" = $1, "Paragraph" = $2, "Timestamp" = current_timestamp
+        where "Id" = $3`;
+      pool.query(sql, [chapterId, paragraph, bookmarkId]);
+    }
+  });
 };
 
 const getBookmarks = userId => {
@@ -74,6 +93,18 @@ const getBookmarks = userId => {
     where k."UserId" = $1
     order by k."IsManual", k."Timestamp" desc`;
   return pool.query(sql, [userId]);
+};
+
+const setBookmark = (userId, chapterId, paragraph) => {
+  log.debug(`setBookmark: ${userId}, ${chapterId}, ${paragraph}`);
+  let sql = `insert into "Bookmarks" ("UserId", "ChapterId", "Paragraph", "IsManual")
+    values ($1, $2, $3, 't')`;
+  return pool.query(sql, [userId, chapterId, paragraph]);
+};
+
+const deleteBookmark = id => {
+  let sql = `delete from "Bookmarks" where "Id" = $1`;
+  return pool.query(sql, [id]);
 };
 
 const getFile = id => {
@@ -89,6 +120,9 @@ module.exports = {
   getChapter,
   getChapters,
   getAutoBookmark,
+  setAutoBookmark,
   getBookmarks,
+  setBookmark,
+  deleteBookmark,
   getFile
 };

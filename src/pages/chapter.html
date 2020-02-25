@@ -58,11 +58,14 @@
     <script>
       const log = require("electron-log");
       const db = require("../db.js");
+      const { remote } = require("electron");
+      const userId = remote.getGlobal("sharedData").userId;
       const params = new URLSearchParams(window.location.search);
       var bookId = parseInt(params.get("bookId"));
       var chapterNumber = parseInt(params.get("chapterNumber"));
       var chaptersCount = 1;
       var paragraph = 1;
+      var chapterId = 1;
       if (params.has("paragraph"))
         paragraph = parseInt(params.get("paragraph"));
       $(function() {
@@ -79,6 +82,7 @@
           .then(result => {
             let chapter = result.rows[0];
             $(".chapter-name").text(chapter["Name"]);
+            chapterId = parseInt(chapter["Id"]);
             let fileId = parseInt(chapter["HtmlFileId"]);
             return db.getFile(fileId);
           })
@@ -92,6 +96,12 @@
               $(window).scrollTop(
                 $(`p[data-index='${paragraph}']`).offset().top
               );
+            $(window).on("scrollstop", function() {
+              paragraph = $("p:in-viewport")
+                .first()
+                .attr("data-index");
+              db.setAutoBookmark(userId, bookId, chapterId, paragraph);
+            });
           })
           .then(() => {
             $("h2").addClass("d-none");
@@ -111,6 +121,11 @@
                 if (chaptersCount > 1)
                   window.location.href = `chapters.html?bookId=${bookId}`;
                 else window.location.href = "books.html";
+              } else if (event.key == "b") {
+                paragraph = $("p:in-viewport")
+                  .first()
+                  .attr("data-index");
+                db.setBookmark(userId, chapterId, paragraph);
               } else if (event.which == 39)
                 nextChapter(bookId, chaptersCount, chapterNumber);
               else if (event.which == 37)
