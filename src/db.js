@@ -45,8 +45,8 @@ const getBooks = term => {
     order by "LastUpdated" desc`;
   if (term)
     sql = `select "Id", "Title", "Author", "LastUpdated" from "Books"
-      where plainto_tsquery($1) @@ tsv`;
-  return term ? pool.query(sql, [term]) : pool.query(sql);
+      where "Title" like $1 or "Author" like $1`;
+  return term ? pool.query(sql, [`%${term}%`]) : pool.query(sql);
 };
 
 const getChapter = (bookId, chapterNumber) => {
