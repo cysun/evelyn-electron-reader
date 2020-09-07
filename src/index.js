@@ -6,18 +6,9 @@ app.allowRendererProcessReuse = false;
 
 const menuTemplate = [
   {
-    label: "Books",
-    click: (item, focusedWindow) => {
-      focusedWindow.loadFile(path.join(__dirname, "pages/books.html"));
-    }
+    label: "Evelyn",
+    submenu: [{ label: "Quit", role: "quit" }],
   },
-  {
-    label: "Bookmarks",
-    click: (item, focusedWindow) => {
-      focusedWindow.loadFile(path.join(__dirname, "pages/bookmarks.html"));
-    }
-  },
-  { label: "Exit", role: "quit" }
 ];
 if (isDev)
   menuTemplate.unshift(
@@ -32,10 +23,9 @@ const createWindow = () => {
     width: 1200,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
-    }
+      nodeIntegration: true,
+    },
   });
-  mainWindow.setMenuBarVisibility(false);
   mainWindow.loadFile(path.join(__dirname, "pages/login.html"));
 };
 
